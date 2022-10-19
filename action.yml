@@ -1,0 +1,11 @@
+name: "check file action"
+description: "Fiel check have"
+runs:
+  using: node12
+  main: checkcode.js
+inputs:
+  repo-token:
+    type: string
+    description: "Github token"
+    required: true
+    default: ${{github.token}}
