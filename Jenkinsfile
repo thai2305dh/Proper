@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     parameters {
-        string(name: 'environment', defaultValue: 'default', description: 'Workspace/environment file to use for deployment')
+        choice(name: 'environment', choices: ['default', 'dev', 'stagging'], description: 'Workspace/environment file to use for deployment')
         string(name: 'version', defaultValue: '', description: 'Version variable to pass to Terraform')
         booleanParam(name: 'autoApprove', defaultValue: false, description: 'Automatically run apply after generating plan?')
     }
@@ -21,6 +21,7 @@ pipeline {
                 }
 		        sh "ls"
                 sh 'terraform init -input=false'
+		sh 'terraform workspace new ${environment}'
                 sh 'terraform workspace select ${environment}'
                 // sh "terraform plan -input=false -out tfplan -var 'version=${params.version}' --var-file=environments/${params.environment}.tfvars"
                 sh "terraform plan -input=false -out tfplan --var-file=environments/${params.environment}.tfvars"   
@@ -46,7 +47,7 @@ pipeline {
 
         stage('Apply') {
             steps {
-                sh "terraform destroy -input=false tfplan"
+                sh "terraform apply -input=false tfplan"
             }
         }
     }
