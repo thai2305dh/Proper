@@ -48,6 +48,7 @@ pipeline {
                 not {
                     equals expected: true, actual: params.autoApprove
                 }
+                expression { params.run != 'destroy' }
             }
 
             steps {
