@@ -60,6 +60,9 @@ pipeline {
         }
 
         stage('Apply') {
+            when {
+                expression { params.run != 'destroy' }
+            }
             steps {
                 sh "terraform apply -input=false tfplan"
             }
