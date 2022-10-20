@@ -19,13 +19,17 @@ pipeline {
                 script {
                     currentBuild.displayName = params.version
                 }
-		        sh "ls"
-                sh 'terraform init -input=false'
-		sh 'terraform workspace new ${environment}'
-                sh 'terraform workspace select ${environment}'
-                // sh "terraform plan -input=false -out tfplan -var 'version=${params.version}' --var-file=environments/${params.environment}.tfvars"
-                sh "terraform plan -input=false -out tfplan --var-file=environments/${params.environment}.tfvars"   
-                sh 'terraform show -no-color tfplan > tfplan.txt'
+                if (fileExists('terraform.tfstate')) {
+                    sh 'terraform workspace select ${environment}'
+                    sh "terraform destroy --auto-approve --var-file=environments/${params.environment}.tfvars"
+                } 
+                else {
+                    sh 'terraform init -input=false'
+                    sh 'terraform workspace select ${environment}'
+                    // sh "terraform plan -input=false -out tfplan -var 'version=${params.version}' --var-file=environments/${params.environment}.tfvars"
+                    sh "terraform plan -input=false -out tfplan --var-file=environments/${params.environment}.tfvars"   
+                    sh 'terraform show -no-color tfplan > tfplan.txt'
+                }                
             }
         }
 
